@@ -1,23 +1,27 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view></router-view>
+    <navigation-top></navigation-top>
+    <!--<el-row>-->
+      <!--<el-col :span="4">-->
+        <!--<navigation-left></navigation-left>-->
+      <!--</el-col>-->
+      <!--<el-col :span="20">-->
+        <!--&lt;!&ndash;<router-view></router-view>&ndash;&gt;-->
+      <!--</el-col>-->
+    <!--</el-row>-->
   </div>
 </template>
 
 <script>
-export default {
-  name: 'app'
-}
+  import NavigationTop from './components/navigation/navigation-top.vue'
+  import NavigationLeft from './components/navigation/navigation-left.vue'
+
+  export default {
+    name: 'app',
+    components: {  NavigationTop , NavigationLeft }
+  }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
 </style>

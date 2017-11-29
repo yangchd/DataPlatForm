@@ -1,24 +1,16 @@
 <template>
   <div id="app">
+    <!--App为index加载的唯一一个页面，这里添加各个组件-->
     <navigation-top></navigation-top>
-    <!--<el-row>-->
-      <!--<el-col :span="4">-->
-        <!--<navigation-left></navigation-left>-->
-      <!--</el-col>-->
-      <!--<el-col :span="20">-->
-        <!--&lt;!&ndash;<router-view></router-view>&ndash;&gt;-->
-      <!--</el-col>-->
-    <!--</el-row>-->
   </div>
 </template>
 
 <script>
   import NavigationTop from './components/navigation/navigation-top.vue'
-  import NavigationLeft from './components/navigation/navigation-left.vue'
 
   export default {
     name: 'app',
-    components: {  NavigationTop , NavigationLeft }
+    components: {  NavigationTop  }
   }
 </script>
 

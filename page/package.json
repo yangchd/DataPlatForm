@@ -11,9 +11,10 @@
     "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
-    "element-ui": "^1.4.6",
-    "vue": "^2.4.2",
-    "vue-router": "^2.7.0"
+    "async-validator": "^1.8.1",
+    "element-ui": "^2.0.5",
+    "vue": "^2.5.2",
+    "vue-router": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
@@ -49,7 +50,7 @@
     "url-loader": "^0.5.8",
     "vue-loader": "^13.0.4",
     "vue-style-loader": "^3.0.1",
-    "vue-template-compiler": "^2.4.2",
+    "vue-template-compiler": "^2.5.9",
     "webpack": "^2.6.1",
     "webpack-bundle-analyzer": "^2.2.1",
     "webpack-dev-middleware": "^1.10.0",

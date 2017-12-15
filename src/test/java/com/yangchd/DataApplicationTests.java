@@ -18,11 +18,9 @@ public class DataApplicationTests {
 	@Test
 	public void contextLoads() {
 		DataSource dataSource = new DataSource();
-		dataSource.setName("名字测试");
-
-		dataSourceDao.save(dataSource);
-
-		System.out.println(dataSourceDao.findAll());
+		dataSource.setName("名字测试1");
+		dataSource = dataSourceDao.save(dataSource);
+		System.out.println(dataSource);
 	}
 
 }

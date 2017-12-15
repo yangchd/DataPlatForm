@@ -23,8 +23,11 @@ let routes = [
     iconCls: 'el-icon-refresh',//图标样式class
     component: Home,
     children: [
-      {path: '/datasource/list',name:'数据源列表', component: DatasourceList},
-      {path: '/datasource/add',name:'新增数据源', component: DatasourceAdd},
+      {path: '/datasource/list',name:'数据源列表', component: DatasourceList
+      ,children: [
+        {path: '/datasource/add',name:'新增数据源', component: DatasourceAdd},
+      ]
+      },
       {path: '/developing',name:'编辑数据源', component: Developing},
       {path: '/developing',name:'同步表配置', component: Developing},
       {path: '/developing',name:'其他配置', component: Developing},

@@ -8,16 +8,16 @@
           <el-input v-model="dataSourceTopForm.inputKey" placeholder="数据源模糊搜索"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="getDataSourceTableList">查询</el-button>
+          <el-button type="primary" @click="getDataSourceListBtn">查询</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleAdd">新增</el-button>
+          <el-button type="primary" @click="handleAddBtn">新增</el-button>
         </el-form-item>
       </el-form>
     </el-col>
 
     <!--中部列表-->
-    <el-table :data="dataSourceTable" v-loading="dataSourceTableLoading" border stripe size="medium"
+    <el-table :data="dataSourceTable" v-loading="dataSourceTableLoading" border stripe size="small"
               style="width: 100%;">
       <el-table-column prop="id" v-if="false">
       </el-table-column>
@@ -31,7 +31,7 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="testConnection(scope.$index, scope.row)">测试
+            @click="testConnectionBtn(scope.$index, scope.row)">测试
           </el-button>
           <el-button
             size="mini"
@@ -40,7 +40,7 @@
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)">删除
+            @click="deleteDataSourceBtn(scope.$index, scope.row)">删除
           </el-button>
         </template>
       </el-table-column>
@@ -50,21 +50,24 @@
     <el-dialog title="新增数据源" :visible.sync="addFormVisible" :center="is_center" width="60%"
                :close-on-click-modal="false">
       <el-form ref="dataSourceForm" :model="dataSourceForm" label-width="80px" :rules="dataSourceForm">
-        <el-col :span="24" v-if="true">
+        <el-col :span="24" v-if="false">
           <el-form-item label="id">
             <el-input v-model="dataSourceForm.id" placeholder="数据源id"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="名称">
-            <el-input v-model="dataSourceForm.name" placeholder="数据源名称"></el-input>
+            <el-input v-model="dataSourceForm.name" placeholder="数据源别名"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
+          <el-form-item label="名称" v-if="false">
+            <el-input v-model="dataSourceForm.driver" placeholder="数据源名称"></el-input>
+          </el-form-item>
           <el-form-item label="驱动">
-            <el-select v-model="valueEmpty" placeholder="请选择数据库类型" size="large">
+            <el-select v-model="valueEmpty" placeholder="请选择数据库类型" size="large" @change="changeValue">
               <el-option
-                v-for="item in dataSourceForm.driver"
+                v-for="item in dataSourceForm.driverSelect"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value">
@@ -91,7 +94,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="参数">
-            <el-input v-model="dataSourceForm.parameter" placeholder="数据库连接参数"></el-input>
+            <el-input v-model="dataSourceForm.parameter" placeholder="数据库连接参数&分割"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="24">
@@ -111,15 +114,16 @@
         </el-col>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="saveDataSource" :loading="addFormLoading">确 定</el-button>
-        <el-button @click="addFormVisible = false">取 消</el-button>
+        <!--<el-button @click="addFormVisible = false">取 消</el-button>-->
+        <el-button type="primary" @click="testConBtn" :loading="testConLoading">测试</el-button>
+        <el-button type="primary" @click="saveDataSourceBtn" :loading="saveFormLoading">保存</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  import {getDataSourceList, saveDataSource} from "../../api/api";
+  import {deleteDataSource, getDataSourceList, saveDataSource, testConnection} from "../../api/api";
   export default {
     data() {
       return {
@@ -134,16 +138,16 @@
 
         //新增相关
         addFormVisible: false,
-        addFormLoading: false,
+        testConLoading: false,
+        saveFormLoading: false,
         is_center: true,
         valueEmpty: '',
         dataSourceForm: {},
-
       }
     },
     methods: {
       //获取用户列表
-      getDataSourceTableList() {
+      getDataSourceTableList: function () {
         let para = {
           inputKey: this.inputKey,
         };
@@ -151,21 +155,24 @@
         getDataSourceList(para).then((res) => {
           this.dataSourceTable = res.data;
           this.dataSourceTableLoading = false;
+        }).catch((res) => {
+          this.dataSourceTableLoading = false;
+          alert(res);
         });
       },
-      testConnection(index, row){
-//          console.log(index);
-        console.log(row.id);
-      },
 
+      //查询按钮
+      getDataSourceListBtn: function () {
+        this.getDataSourceTableList();
+      },
       //打开新增按钮
-      handleAdd: function () {
+      handleAddBtn: function () {
         this.addFormVisible = true;
-        this.value6 = '';
         this.dataSourceForm = {
           id: '',
-          name: '1',
-          driver: [{
+          name: '数据库测试',
+          driver: '',
+          driverSelect: [{
             value: 'com.mysql.jdbc.Driver',
             label: 'MySQL'
           }, {
@@ -178,45 +185,92 @@
             value: 'com.microsoft.jdbc.sqlserver.SQLServerDriver',
             label: 'SQL Server'
           }],
-          ip: '2',
-          port: '3',
-          basename: '4',
-          parameter: '5',
-          url: '6',
-          username: '7',
-          password: '8',
+          ip: 'localhost',
+          port: '3306',
+          basename: 'idea',
+          parameter: '',
+          url: '',
+          username: 'ycd',
+          password: '111111',
         };
       },
+
+      /**
+       * 新增面板方法
+       */
+      changeValue(value) {
+        //实际数据源地址
+        this.dataSourceForm.driver = value;
+        //实际连接地址拼接
+        let prefixUrl = "";
+        if (this.dataSourceForm.driver === "com.mysql.jdbc.Driver") {
+          prefixUrl = "jdbc:mysql://" + this.dataSourceForm.ip + ":" + this.dataSourceForm.port + "/" + this.dataSourceForm.basename;
+        } else if (this.dataSourceForm.driver === "oracle.jdbc.driver.OracleDriver") {
+          prefixUrl = "jdbc:oracle:thin:@" + this.dataSourceForm.ip + ":" + this.dataSourceForm.port + ":" + this.dataSourceForm.basename;
+        } else if (this.dataSourceForm.driver === "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+          || driver === "com.microsoft.jdbc.sqlserver.SQLServerDriver") {
+          prefixUrl = "jdbc:sqlserver://" + this.dataSourceForm.ip + ":" + this.dataSourceForm.port + ";DatabaseName=" + this.dataSourceForm.basename;
+        }
+        this.dataSourceForm.url = prefixUrl;
+      },
+      testConBtn(index, row){
+//        console.log(row.id);
+        this.testConLoading = true;
+        let para = Object.assign({}, this.dataSourceForm);
+        para.driverSelect = para.driver;
+        testConnection(para).then((res) => {
+          this.testConLoading = false;
+          if (res.code === '0') {
+            this.$message.success(res.msg);
+          } else {
+            this.$message.error(res.msg);
+          }
+        }).catch(() => {
+          //取消操作
+          this.$refs['dataSourceForm'].resetFields();
+        });
+      },
       //保存按钮
-      saveDataSource: function () {
+      saveDataSourceBtn: function () {
         this.$refs.dataSourceForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addFormLoading = true;
-//              let para = Object.assign({}, this.dataSourceForm);
-              let para = {
-                id: this.dataSourceForm.id,
-                name: this.dataSourceForm.name,
-                driver: this.dataSourceForm.driver,
-                ip: this.dataSourceForm.ip,
-                port: this.dataSourceForm.port,
-                basename: this.dataSourceForm.basename,
-                url: this.dataSourceForm.url,
-                username: this.dataSourceForm.username,
-                password: this.dataSourceForm.password,
-              };
+              let para = Object.assign({}, this.dataSourceForm);
+              para.driverSelect = para.driver;
               saveDataSource(para).then((res) => {
                 this.addFormLoading = false;
-//                this.addFormVisible = false;
-                this.$message({
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['dataSourceForm'].resetFields();
-                this.getDataSourceTableList();
+                if (res.code === '0') {
+                  this.$message.success(res.msg);
+                  this.$refs['dataSourceForm'].resetFields();
+                  this.getDataSourceTableList();
+                  this.addFormVisible = false;
+                } else {
+                  this.$message.error(res.msg);
+                }
               });
+            }).catch(() => {
+              //取消操作
+              this.$refs['dataSourceForm'].resetFields();
             });
           }
+        });
+      }
+      ,
+      //Table内三个按钮功能
+      deleteDataSourceBtn: function (index, row) {
+        this.$confirm('确认删除吗？', '提示', {}).then(() => {
+          let para = Object.assign({}, row);
+          deleteDataSource(para).then((res) => {
+            if (res.code === '0') {
+              this.$message.success(res.msg);
+              this.getDataSourceTableList();
+            } else {
+              this.$message.error(res.msg);
+            }
+          });
+        }).catch(() => {
+          //取消操作
         });
       }
     }

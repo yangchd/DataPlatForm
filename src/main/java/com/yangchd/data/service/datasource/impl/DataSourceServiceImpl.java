@@ -1,11 +1,15 @@
 package com.yangchd.data.service.datasource.impl;
 
+import com.yangchd.config.DataPlatformLogger;
 import com.yangchd.data.dao.DataSourceDao;
 import com.yangchd.data.service.datasource.IDataSourceService;
 import com.yangchd.data.table.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -27,7 +31,35 @@ public class DataSourceServiceImpl implements IDataSourceService {
     }
 
     @Override
-    public int add(DataSource dataSource) {
+    public int save(DataSource dataSource) {
         return dataSourceDao.save(dataSource)==null?0:1;
     }
+
+    @Override
+    public int deleteByID(DataSource dataSource) {
+        if(null != dataSource.getId()){
+            dataSourceDao.delete(dataSource);
+            return 1;
+        }else {
+            return 0;
+        }
+    }
+
+    @Override
+    public Boolean testConnection(DataSource dataSource) throws Exception {
+        Boolean flag = false;
+        Connection con;
+        try {
+            Class.forName(dataSource.getDriver());
+            con = DriverManager.getConnection(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
+            if (null!= con && !con.isClosed()) {
+                flag = true;
+                con.close();
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new Exception(e);
+        }
+        return flag;
+    }
+
 }

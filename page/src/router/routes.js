@@ -3,8 +3,11 @@ import Home from '../pages/Home.vue'
 import ERROR from '../pages/404.vue'
 
 import DatasourceList from '../components/datasource/datasource-list.vue'
-import DatasourceAdd from '../components/datasource/datasource-add.vue'
+import TableConfig from '../components/table/table-config-list.vue'
 import Developing from '../pages/Developing.vue'
+
+// leaf:true    单节点控制
+//hidden: true  隐藏控制
 
 let routes = [
   {
@@ -23,13 +26,8 @@ let routes = [
     iconCls: 'el-icon-refresh',//图标样式class
     component: Home,
     children: [
-      {path: '/datasource/list',name:'数据源列表', component: DatasourceList
-      ,children: [
-        {path: '/datasource/add',name:'新增数据源', component: DatasourceAdd},
-      ]
-      },
-      {path: '/developing',name:'编辑数据源', component: Developing},
-      {path: '/developing',name:'同步表配置', component: Developing},
+      {path: '/datasource/list',name:'数据源列表', component: DatasourceList},
+      {path: '/TableConfig/list',name:'同步表配置', component: TableConfig},
       {path: '/developing',name:'其他配置', component: Developing},
     ],
   },{
@@ -37,9 +35,9 @@ let routes = [
     name: '定时任务',
     iconCls: 'el-icon-time',//图标样式class
     component: Home,
+    // hidden:true,
     children: [
       {path: '/developing',name:'任务列表', component: DatasourceList},
-      {path: '/developing',name:'任务管理', component: DatasourceAdd},
     ],
   },{
     path: '/',

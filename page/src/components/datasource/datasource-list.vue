@@ -29,19 +29,9 @@
       </el-table-column>
       <el-table-column label="操作" width="300px">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            @click="testConnectionBtn(scope.$index, scope.row)">测试
-          </el-button>
-          <el-button
-            size="mini"
-            @click="handleEdit(scope.$index, scope.row)">编辑
-          </el-button>
-          <el-button
-            size="mini"
-            type="danger"
-            @click="deleteDataSourceBtn(scope.$index, scope.row)">删除
-          </el-button>
+          <el-button size="mini" @click="testDataSourceBtn(scope.$index, scope.row)">测试</el-button>
+          <el-button size="mini" @click="editDataSourceBtn(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="deleteDataSourceBtn(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -61,16 +51,13 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="名称" v-if="false">
-            <el-input v-model="dataSourceForm.driver" placeholder="数据源名称"></el-input>
-          </el-form-item>
           <el-form-item label="驱动">
-            <el-select v-model="valueEmpty" placeholder="请选择数据库类型" size="large" @change="changeValue">
+            <el-select v-model="dataSourceForm.driver" placeholder="请选择数据库类型" size="large" @change="changeValue">
               <el-option
                 v-for="item in dataSourceForm.driverSelect"
                 :key="item.value"
                 :label="item.label"
-                :value="item.value">
+                :value="item.value" :selected="item.is_select">
                 <span style="float: left">{{ item.label }}</span>
                 <span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
               </el-option>
@@ -97,11 +84,6 @@
             <el-input v-model="dataSourceForm.parameter" placeholder="数据库连接参数&分割"></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="24">
-          <el-form-item label="连接地址">
-            <el-input v-model="dataSourceForm.url" placeholder="实际连接地址" :disabled="true"></el-input>
-          </el-form-item>
-        </el-col>
         <el-col :span="12">
           <el-form-item label="用户名">
             <el-input v-model="dataSourceForm.username" placeholder="用户名"></el-input>
@@ -110,6 +92,11 @@
         <el-col :span="12">
           <el-form-item label="密码">
             <el-input v-model="dataSourceForm.password" placeholder="密码"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="连接地址">
+            <el-input v-model="dataSourceForm.url" placeholder="实际连接地址" :disabled="true"></el-input>
           </el-form-item>
         </el-col>
       </el-form>
@@ -137,11 +124,23 @@
         dataSourceTable: [],
 
         //新增相关
+        driverType: [{
+          value: 'com.mysql.jdbc.Driver',
+          label: 'MySQL'
+        }, {
+          value: 'oracle.jdbc.driver.OracleDriver',
+          label: 'Oracle'
+        }, {
+          value: 'com.microsoft.sqlserver.jdbc.SQLServerDriver',
+          label: 'SQL Server'
+        }, {
+          value: 'com.microsoft.jdbc.sqlserver.SQLServerDriver',
+          label: 'SQL Server'
+        }],
         addFormVisible: false,
         testConLoading: false,
         saveFormLoading: false,
         is_center: true,
-        valueEmpty: '',
         dataSourceForm: {},
       }
     },
@@ -165,26 +164,17 @@
       getDataSourceListBtn: function () {
         this.getDataSourceTableList();
       },
-      //打开新增按钮
+
+      /**
+       * 新增按钮初始化
+       */
       handleAddBtn: function () {
         this.addFormVisible = true;
         this.dataSourceForm = {
           id: '',
           name: '数据库测试',
           driver: '',
-          driverSelect: [{
-            value: 'com.mysql.jdbc.Driver',
-            label: 'MySQL'
-          }, {
-            value: 'oracle.jdbc.driver.OracleDriver',
-            label: 'Oracle'
-          }, {
-            value: 'com.microsoft.sqlserver.jdbc.SQLServerDriver',
-            label: 'SQL Server'
-          }, {
-            value: 'com.microsoft.jdbc.sqlserver.SQLServerDriver',
-            label: 'SQL Server'
-          }],
+          driverSelect: this.driverType,
           ip: 'localhost',
           port: '3306',
           basename: 'idea',
@@ -213,8 +203,10 @@
         }
         this.dataSourceForm.url = prefixUrl;
       },
-      testConBtn(index, row){
-//        console.log(row.id);
+      /**
+       * 新增面板测试按钮
+       */
+      testConBtn(){
         this.testConLoading = true;
         let para = Object.assign({}, this.dataSourceForm);
         para.driverSelect = para.driver;
@@ -226,38 +218,63 @@
             this.$message.error(res.msg);
           }
         }).catch(() => {
-          //取消操作
-          this.$refs['dataSourceForm'].resetFields();
+          this.testConLoading = false;
         });
       },
-      //保存按钮
+      /**
+       * 保存数据源按钮
+       */
       saveDataSourceBtn: function () {
         this.$refs.dataSourceForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addFormLoading = true;
+              this.saveFormLoading = true;
               let para = Object.assign({}, this.dataSourceForm);
               para.driverSelect = para.driver;
               saveDataSource(para).then((res) => {
-                this.addFormLoading = false;
+                this.saveFormLoading = false;
                 if (res.code === '0') {
                   this.$message.success(res.msg);
-                  this.$refs['dataSourceForm'].resetFields();
                   this.getDataSourceTableList();
                   this.addFormVisible = false;
                 } else {
                   this.$message.error(res.msg);
                 }
+              }).catch(() => {
+                this.saveFormLoading = false;
               });
             }).catch(() => {
               //取消操作
-              this.$refs['dataSourceForm'].resetFields();
             });
           }
         });
-      }
-      ,
-      //Table内三个按钮功能
+      },
+
+      /**
+       * Table列表测试连接
+       */
+      testDataSourceBtn: function (index, row) {
+        let para = Object.assign({}, row);
+        testConnection(para).then((res) => {
+          if (res.code === '0') {
+            this.$message.success(res.msg);
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
+      },
+      /**
+       * Table列表编辑按钮
+       */
+      editDataSourceBtn: function (index, row) {
+        this.addFormVisible = true;
+        this.dataSourceForm = row;
+        this.dataSourceForm.driverSelect = this.driverType;
+      },
+      /**
+       * Table列表删除功能
+       */
       deleteDataSourceBtn: function (index, row) {
         this.$confirm('确认删除吗？', '提示', {}).then(() => {
           let para = Object.assign({}, row);
@@ -273,6 +290,7 @@
           //取消操作
         });
       }
+
     }
   }
 </script>

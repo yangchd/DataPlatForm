@@ -57,7 +57,7 @@
                 v-for="item in dataSourceForm.driverSelect"
                 :key="item.value"
                 :label="item.label"
-                :value="item.value" :selected="item.is_select">
+                :value="item.value">
                 <span style="float: left">{{ item.label }}</span>
                 <span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
               </el-option>
@@ -156,7 +156,7 @@
           this.dataSourceTableLoading = false;
         }).catch((res) => {
           this.dataSourceTableLoading = false;
-          alert(res);
+          this.$message.error(res);
         });
       },
 
@@ -228,7 +228,6 @@
         this.$refs.dataSourceForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
-              this.addFormLoading = true;
               this.saveFormLoading = true;
               let para = Object.assign({}, this.dataSourceForm);
               para.driverSelect = para.driver;

@@ -17,7 +17,7 @@ public interface IDataSourceService {
     List<DataSource> queryAll();
 
     /**
-     * 保存数据源    0 成功  1 失败
+     * 保存数据源    1 成功  0 失败
      * 如果有主键，则修改；没有主键，新增。
      * @param dataSource    数据源参数
      * @return              成功数量
@@ -25,7 +25,7 @@ public interface IDataSourceService {
     int save(DataSource dataSource);
 
     /**
-     * 删除数据源    0 成功  1 失败
+     * 删除数据源    1 成功  0 失败
      * @param dataSource    数据源参数
      * @return              成功数量
      */
@@ -37,4 +37,11 @@ public interface IDataSourceService {
      * @return              连接成功或者失败
      */
     Boolean testConnection(DataSource dataSource) throws Exception;
+
+    /**
+     * 根据数据源id获取数据源
+     * @param id    数据源id
+     * @return      数据源
+     */
+    DataSource getDataSourceByID(String id);
 }

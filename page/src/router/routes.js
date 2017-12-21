@@ -27,7 +27,7 @@ let routes = [
     component: Home,
     children: [
       {path: '/datasource/list',name:'数据源列表', component: DatasourceList},
-      {path: '/TableConfig/list',name:'同步表配置', component: TableConfig},
+      {path: '/table/list',name:'同步表配置', component: TableConfig},
       {path: '/developing',name:'其他配置', component: Developing},
     ],
   },{

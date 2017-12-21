@@ -12,4 +12,9 @@ import java.io.Serializable;
 @Repository
 public interface DataSourceDao extends JpaRepository<DataSource,Serializable> {
 
+    /**
+     * 根据数据源id获取数据源全部信息
+     */
+    DataSource findById(String id);
+
 }

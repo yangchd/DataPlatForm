@@ -1,6 +1,5 @@
 package com.yangchd.data.service.datasource.impl;
 
-import com.yangchd.config.DataPlatformLogger;
 import com.yangchd.data.dao.DataSourceDao;
 import com.yangchd.data.service.datasource.IDataSourceService;
 import com.yangchd.data.table.DataSource;
@@ -60,6 +59,11 @@ public class DataSourceServiceImpl implements IDataSourceService {
             throw new Exception(e);
         }
         return flag;
+    }
+
+    @Override
+    public DataSource getDataSourceByID(String id) {
+        return dataSourceDao.findById(id);
     }
 
 }

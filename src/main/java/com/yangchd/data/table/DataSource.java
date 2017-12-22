@@ -17,13 +17,16 @@ public class DataSource {
     @Column(name = "id")
     private String id;
     private String name;
-    private String url;
-    private String username;
-    private String password;
-    private String basename;
+    private String description;
     private String driver;
     private String ip;
     private String port;
+    private String username;
+    private String password;
+    private String basename;
+    private String parameter;
+    private String url;
+    private String realurl;
 
     public String getId() {
         return id;
@@ -41,36 +44,12 @@ public class DataSource {
         this.name = name;
     }
 
-    public String getUrl() {
-        return url;
+    public String getDescription() {
+        return description;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getBasename() {
-        return basename;
-    }
-
-    public void setBasename(String basename) {
-        this.basename = basename;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getDriver() {
@@ -97,18 +76,69 @@ public class DataSource {
         this.port = port;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getBasename() {
+        return basename;
+    }
+
+    public void setBasename(String basename) {
+        this.basename = basename;
+    }
+
+    public String getParameter() {
+        return parameter;
+    }
+
+    public void setParameter(String parameter) {
+        this.parameter = parameter;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getRealurl() {
+        return realurl;
+    }
+
+    public void setRealurl(String realurl) {
+        this.realurl = realurl;
+    }
+
     @Override
     public String toString() {
         return "DataSource{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", basename='" + basename + '\'' +
+                ", description='" + description + '\'' +
                 ", driver='" + driver + '\'' +
                 ", ip='" + ip + '\'' +
                 ", port='" + port + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", basename='" + basename + '\'' +
+                ", parameter='" + parameter + '\'' +
+                ", url='" + url + '\'' +
+                ", realurl='" + realurl + '\'' +
                 '}';
     }
 }

@@ -30,4 +30,7 @@ public interface ITableConfigService {
      * @return              成功数量
      */
     int deleteByID(TableConfig tableConfig);
+
+
+    TableConfig findById(String id);
 }

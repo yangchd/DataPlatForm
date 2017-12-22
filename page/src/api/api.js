@@ -34,3 +34,6 @@ export const saveTableConfig = params => {return axios.get(`${base}/table/save`,
 
 //删除同步配置
 export const deleteTableConfig = params => {return axios.get(`${base}/table/delete`, {params:params}).then(res => res.data);};
+
+//测试同步
+export const testTableSyn = params => {return axios.get(`${base}/table/test`, {params:params}).then(res => res.data);};

@@ -30,6 +30,16 @@ public class DataSourceServiceImpl implements IDataSourceService {
     }
 
     @Override
+    public List<DataSource> queryByKey(String key) {
+        return dataSourceDao.findByNameContainingOrUrlContainingOrUsernameContaining(key,key,key);
+    }
+    @Override
+    public DataSource getDataSourceByID(String id) {
+        return dataSourceDao.findById(id);
+    }
+
+
+    @Override
     public int save(DataSource dataSource) {
         return dataSourceDao.save(dataSource)==null?0:1;
     }
@@ -50,7 +60,11 @@ public class DataSourceServiceImpl implements IDataSourceService {
         Connection con;
         try {
             Class.forName(dataSource.getDriver());
-            con = DriverManager.getConnection(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
+            if(null != dataSource.getRealurl()){
+                con = DriverManager.getConnection(dataSource.getRealurl(), dataSource.getUsername(), dataSource.getPassword());
+            }else {
+                con = DriverManager.getConnection(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
+            }
             if (null!= con && !con.isClosed()) {
                 flag = true;
                 con.close();
@@ -59,11 +73,6 @@ public class DataSourceServiceImpl implements IDataSourceService {
             throw new Exception(e);
         }
         return flag;
-    }
-
-    @Override
-    public DataSource getDataSourceByID(String id) {
-        return dataSourceDao.findById(id);
     }
 
 }

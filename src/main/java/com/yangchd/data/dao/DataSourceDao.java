@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author yangchd  2017/12/12.
@@ -16,5 +17,9 @@ public interface DataSourceDao extends JpaRepository<DataSource,Serializable> {
      * 根据数据源id获取数据源全部信息
      */
     DataSource findById(String id);
+
+//    List<DataSource> findByNameOrUrlOrUsername(String key);
+
+    List<DataSource> findByNameContainingOrUrlContainingOrUsernameContaining(String name,String url,String username);
 
 }

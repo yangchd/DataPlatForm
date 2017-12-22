@@ -40,4 +40,9 @@ public class TableConfigServiceImpl implements ITableConfigService {
             return 0;
         }
     }
+
+    @Override
+    public TableConfig findById(String id) {
+        return tableConfigDao.findById(id);
+    }
 }

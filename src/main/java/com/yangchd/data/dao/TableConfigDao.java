@@ -12,4 +12,5 @@ import java.io.Serializable;
 @Repository
 public interface TableConfigDao extends JpaRepository<TableConfig,Serializable> {
 
+    TableConfig findById(String id);
 }

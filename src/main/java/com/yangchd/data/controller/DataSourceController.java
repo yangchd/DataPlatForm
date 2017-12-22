@@ -1,6 +1,7 @@
 package com.yangchd.data.controller;
 
 import com.yangchd.config.DataPlatformLogger;
+import com.yangchd.data.dao.util.DataBaseTool;
 import com.yangchd.data.service.datasource.IDataSourceService;
 import com.yangchd.data.table.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,12 @@ public class DataSourceController {
 
     private final IDataSourceService dataSourceService;
 
+    private final DataBaseTool dataBaseTool;
+
     @Autowired
-    public DataSourceController(IDataSourceService dataSourceService) {
+    public DataSourceController(IDataSourceService dataSourceService, DataBaseTool dataBaseTool) {
         this.dataSourceService = dataSourceService;
+        this.dataBaseTool = dataBaseTool;
     }
 
     @RequestMapping(value = "/test")
@@ -47,11 +51,17 @@ public class DataSourceController {
     }
 
     @RequestMapping(value = "/list")
-    public Map<String, Object> getDataSourceList() {
+    public Map<String, Object> getDataSourceList(String key) {
         Map<String, Object> rMap = new HashMap<>(4);
-        List<DataSource> list = dataSourceService.queryAll();
-        rMap.put("code", "0");
+        List<DataSource> list;
+        if(null != key && !"".equals(key)){
+            list = dataSourceService.queryByKey(key);
+        }else {
+            list = dataSourceService.queryAll();
+        }
         rMap.put("data", list);
+
+        rMap.put("code", "0");
         rMap.put("msg", "查询成功");
         return rMap;
     }
@@ -59,13 +69,19 @@ public class DataSourceController {
     @RequestMapping(value = "/save")
     public Map<String, Object> saveDataSource(DataSource dataSource) {
         Map<String, Object> rMap = new HashMap<>(4);
-        int result = dataSourceService.save(dataSource);
-        if (result > 0) {
-            rMap.put("code", "0");
-            rMap.put("msg", "保存成功");
-        } else {
+        try {
+            dataSource.setRealurl(dataBaseTool.getRealConUrl(dataSource));
+            int result = dataSourceService.save(dataSource);
+            if (result > 0) {
+                rMap.put("code", "0");
+                rMap.put("msg", "保存成功");
+            } else {
+                rMap.put("code", "1");
+                rMap.put("msg", "保存失败");
+            }
+        } catch (Exception e) {
             rMap.put("code", "1");
-            rMap.put("msg", "保存失败");
+            rMap.put("msg", e.getMessage());
         }
         return rMap;
     }

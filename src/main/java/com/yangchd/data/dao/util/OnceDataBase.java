@@ -40,8 +40,11 @@ public class OnceDataBase {
     private Connection getConnection(){
         try{
             Class.forName(dataSource.getDriver());
-            con = DriverManager.getConnection(dataSource.getUrl(),
-                    dataSource.getUsername(),dataSource.getPassword());
+            if(null != dataSource.getRealurl()){
+                this.con = DriverManager.getConnection(dataSource.getRealurl(), dataSource.getUsername(), dataSource.getPassword());
+            }else {
+                this.con = DriverManager.getConnection(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
+            }
         }catch(Exception e){
             if(con != null) {
                 try {
@@ -81,27 +84,7 @@ public class OnceDataBase {
         }
     }
 
-    /**
-     * 执行更新
-     */
-    public int execUpdate(String sql, Object[] params) throws Exception {
-        try {
-            this.getConnection();
-            // 获得预设语句对象
-            this.pstmt = this.con.prepareStatement(sql);
-            if (params != null) {
-                // 设置参数列表
-                for (int i = 0; i < params.length; i++) {
-                    // 因为问号参数的索引是从1开始，所以是i+1
-                    this.pstmt.setObject(i + 1, params[i]);
-                }
-            }
-            // 执行更新，并返回影响行数
-            return this.pstmt.executeUpdate();
-        } finally {
-            this.close(this.rs, this.pstmt, this.con);
-        }
-    }
+
 
     /**
      * 执行查询

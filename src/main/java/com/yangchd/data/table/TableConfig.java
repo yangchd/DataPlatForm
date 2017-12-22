@@ -25,20 +25,35 @@ public class TableConfig {
     private String tableto;
     private String tablekey;
     private String tablefrom;
+    @Column(length = 2000)
     private String jointable;
+    @Column(length = 2000)
     private String whereto;
+    @Column(length = 2000)
     private String wherefrom;
     /*****************列配置***************/
+    @Column(length = 2000)
     private String columnto;
+    @Column(length = 2000)
     private String columnfrom;
+    @Column(length = 2000)
     private String relation;
-    /***************同步配置***************/
-    private String synflag;
+    /***************同步统计***************/
     private String lasttime;
     private String timecost;
+    private String computetime;
+    private String sqlquerytime;
+    private String sqlruntime;
     private String synmsg;
+    /***************同步模式***************/
+    private String synflag;
+    /**同步模式（normal，middle，trigger）**/
     private String syntype;
+    /**同步量（update,insert,delete）**/
+    private String synvalue;
+    /**日志是否开启**/
     private String logflag;
+    /**遇到错误是否继续**/
     private String errorflag;
 
     public String getId() {
@@ -153,14 +168,6 @@ public class TableConfig {
         this.relation = relation;
     }
 
-    public String getSynflag() {
-        return synflag;
-    }
-
-    public void setSynflag(String synflag) {
-        this.synflag = synflag;
-    }
-
     public String getLasttime() {
         return lasttime;
     }
@@ -177,6 +184,30 @@ public class TableConfig {
         this.timecost = timecost;
     }
 
+    public String getComputetime() {
+        return computetime;
+    }
+
+    public void setComputetime(String computetime) {
+        this.computetime = computetime;
+    }
+
+    public String getSqlquerytime() {
+        return sqlquerytime;
+    }
+
+    public void setSqlquerytime(String sqlquerytime) {
+        this.sqlquerytime = sqlquerytime;
+    }
+
+    public String getSqlruntime() {
+        return sqlruntime;
+    }
+
+    public void setSqlruntime(String sqlruntime) {
+        this.sqlruntime = sqlruntime;
+    }
+
     public String getSynmsg() {
         return synmsg;
     }
@@ -185,12 +216,28 @@ public class TableConfig {
         this.synmsg = synmsg;
     }
 
+    public String getSynflag() {
+        return synflag;
+    }
+
+    public void setSynflag(String synflag) {
+        this.synflag = synflag;
+    }
+
     public String getSyntype() {
         return syntype;
     }
 
     public void setSyntype(String syntype) {
         this.syntype = syntype;
+    }
+
+    public String getSynvalue() {
+        return synvalue;
+    }
+
+    public void setSynvalue(String synvalue) {
+        this.synvalue = synvalue;
     }
 
     public String getLogflag() {
@@ -226,11 +273,15 @@ public class TableConfig {
                 ", columnto='" + columnto + '\'' +
                 ", columnfrom='" + columnfrom + '\'' +
                 ", relation='" + relation + '\'' +
-                ", synflag='" + synflag + '\'' +
                 ", lasttime='" + lasttime + '\'' +
                 ", timecost='" + timecost + '\'' +
+                ", computetime='" + computetime + '\'' +
+                ", sqlquerytime='" + sqlquerytime + '\'' +
+                ", sqlruntime='" + sqlruntime + '\'' +
                 ", synmsg='" + synmsg + '\'' +
+                ", synflag='" + synflag + '\'' +
                 ", syntype='" + syntype + '\'' +
+                ", synvalue='" + synvalue + '\'' +
                 ", logflag='" + logflag + '\'' +
                 ", errorflag='" + errorflag + '\'' +
                 '}';

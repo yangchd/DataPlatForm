@@ -1,8 +1,9 @@
 package com.yangchd.data.controller;
 
-import com.yangchd.data.dao.util.DaoTool;
+import com.yangchd.data.dao.util.DataBaseTool;
 import com.yangchd.data.service.datasource.IDataSourceService;
 import com.yangchd.data.service.table.ITableConfigService;
+import com.yangchd.data.synchronize.IDataSynService;
 import com.yangchd.data.table.DataSource;
 import com.yangchd.data.table.TableConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,20 @@ import java.util.Map;
 @RequestMapping("/table")
 public class TableConfigController {
 
-    private final DaoTool daoTool;
+    private final DataBaseTool dataBaseTool;
 
     private final IDataSourceService dataSourceService;
 
     private final ITableConfigService tableConfigService;
 
+    private final IDataSynService dataSynService;
+
     @Autowired
-    public TableConfigController(ITableConfigService tableConfigService, IDataSourceService dataSourceService, DaoTool daoTool) {
+    public TableConfigController(ITableConfigService tableConfigService, IDataSourceService dataSourceService, DataBaseTool dataBaseTool, IDataSynService dataSynService) {
         this.tableConfigService = tableConfigService;
         this.dataSourceService = dataSourceService;
-        this.daoTool = daoTool;
+        this.dataBaseTool = dataBaseTool;
+        this.dataSynService = dataSynService;
     }
 
     @RequestMapping(value = "/list")
@@ -47,13 +51,20 @@ public class TableConfigController {
     @RequestMapping(value = "/save")
     public Map<String, Object> saveDataSource(TableConfig tableConfig) {
         Map<String, Object> rMap = new HashMap<>(4);
-        int result = tableConfigService.save(tableConfig);
-        if (result > 0) {
-            rMap.put("code", "0");
-            rMap.put("msg", "保存成功");
-        } else {
+        DataSource dataSource = dataSourceService.getDataSourceByID(tableConfig.getDatato());
+        try {
+            tableConfig.setTablekey(dataBaseTool.getKeyByTableName(dataSource,tableConfig.getTableto()));
+            int result = tableConfigService.save(tableConfig);
+            if (result > 0) {
+                rMap.put("code", "0");
+                rMap.put("msg", "保存成功");
+            } else {
+                rMap.put("code", "1");
+                rMap.put("msg", "保存失败");
+            }
+        } catch (Exception e) {
             rMap.put("code", "1");
-            rMap.put("msg", "保存失败");
+            rMap.put("msg", e.getMessage());
         }
         return rMap;
     }
@@ -81,7 +92,7 @@ public class TableConfigController {
         DataSource dataSource = dataSourceService.getDataSourceByID(id);
         List<Map<String, Object>> nameList;
         try {
-            nameList = daoTool.getTableNameList(dataSource);
+            nameList = dataBaseTool.getTableNameList(dataSource);
             rMap.put("code", "0");
             rMap.put("msg", "查询成功");
             rMap.put("data", nameList);
@@ -96,7 +107,7 @@ public class TableConfigController {
      * 根据数据源和表名称获取所有列
      */
     @RequestMapping(value = "/column")
-    public Map<String, Object> getColumnByTableName(String id,String name) {
+    public Map<String, Object> getColumnByTableName(String id,String name,String type) {
         Map<String, Object> rMap = new HashMap<>(4);
         DataSource dataSource = dataSourceService.getDataSourceByID(id);
         List<Map<String, Object>> columnList = new ArrayList<>();
@@ -104,7 +115,7 @@ public class TableConfigController {
             String separator = ",";
             for (String tablename:name.split(separator)){
                 if(null != tablename && !"".equals(tablename)){
-                    columnList.addAll(daoTool.getAllColumnByTableName(dataSource,tablename));
+                    columnList.addAll(dataBaseTool.getAllColumnByTableName(dataSource,tablename,type));
                 }
             }
             rMap.put("code", "0");
@@ -113,6 +124,24 @@ public class TableConfigController {
         } catch (Exception e) {
             rMap.put("code", "1");
             rMap.put("msg", e.getMessage());
+        }
+        return rMap;
+    }
+
+    /**
+     * 测试同步
+     */
+    @RequestMapping(value = "/test")
+    public Map<String, Object> testSynchronize(TableConfig tableConfig) {
+        Map<String, Object> rMap = new HashMap<>(4);
+        TableConfig config = tableConfigService.findById(tableConfig.getId());
+        try {
+            dataSynService.startDataSyn(config);
+            rMap.put("code", "0");
+            rMap.put("msg", "同步成功");
+        } catch (Exception e) {
+            rMap.put("code", "1");
+            rMap.put("msg",e.getMessage());
         }
         return rMap;
     }

@@ -2,7 +2,6 @@ package com.yangchd.data.service.datasource;
 
 import com.yangchd.data.table.DataSource;
 
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -17,6 +16,19 @@ public interface IDataSourceService {
     List<DataSource> queryAll();
 
     /**
+     * 根据关键字查询数据源
+     * @return 数据源列表
+     */
+    List<DataSource> queryByKey(String key);
+
+    /**
+     * 根据数据源id获取数据源
+     * @param id    数据源id
+     * @return      数据源
+     */
+    DataSource getDataSourceByID(String id);
+
+    /**
      * 保存数据源    1 成功  0 失败
      * 如果有主键，则修改；没有主键，新增。
      * @param dataSource    数据源参数
@@ -26,6 +38,7 @@ public interface IDataSourceService {
 
     /**
      * 删除数据源    1 成功  0 失败
+     * spring data jpa根据主键删除
      * @param dataSource    数据源参数
      * @return              成功数量
      */
@@ -38,10 +51,4 @@ public interface IDataSourceService {
      */
     Boolean testConnection(DataSource dataSource) throws Exception;
 
-    /**
-     * 根据数据源id获取数据源
-     * @param id    数据源id
-     * @return      数据源
-     */
-    DataSource getDataSourceByID(String id);
 }

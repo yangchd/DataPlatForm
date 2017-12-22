@@ -18,8 +18,10 @@ public interface DataSourceDao extends JpaRepository<DataSource,Serializable> {
      */
     DataSource findById(String id);
 
-//    List<DataSource> findByNameOrUrlOrUsername(String key);
 
+    /**
+     * 数据源列表模糊查询
+     */
     List<DataSource> findByNameContainingOrUrlContainingOrUsernameContaining(String name,String url,String username);
 
 }

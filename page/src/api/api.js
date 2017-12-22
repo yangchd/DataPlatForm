@@ -6,7 +6,12 @@ let base = 'http://localhost:9001';
 /**
  * 登录请求
  */
-export const requestLogin = params => { return axios.post(`${base}/login`, params).then(res => res.data); };
+export const userLogin = params => {
+  return axios.post(`${base}/login/user`, params).then(
+    res => res.data
+  );
+};
+// export const userLogin = params => { return axios.get(`${base}/login/user`, {params:params}).then(res => res.data); };
 
 //获取数据列表请求
 export const getDataSourceList = params => {return axios.get(`${base}/datasource/list`, {params:params}).then(res => res.data);};

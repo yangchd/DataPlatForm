@@ -23,23 +23,23 @@ public class TableSynNormal {
      */
     void tableSynchronize(TableConfig tableConfig, NoCloseDataBase fromdao, NoCloseDataBase todao)
             throws Exception {
-        List<Map<String,Object>> sqlList = getSQL(tableConfig, fromdao, todao);
+        List<Map<String, Object>> sqlList = getSQL(tableConfig, fromdao, todao);
 
         Date sqlRunBeginTime = new Date();
-        if(sqlList!=null && sqlList.size()>0){
-            for(Map<String,Object> sqlMap:sqlList){
-                String sql = sqlMap.get("sql")==null?"":sqlMap.get("sql").toString();
+        if (sqlList != null && sqlList.size() > 0) {
+            for (Map<String, Object> sqlMap : sqlList) {
+                String sql = sqlMap.get("sql") == null ? "" : sqlMap.get("sql").toString();
                 List<Object[]> plist = null;
-                if(sqlMap.get("plist") != null){
-                    plist = (List<Object[]>)sqlMap.get("plist");
+                if (sqlMap.get("plist") != null) {
+                    plist = (List<Object[]>) sqlMap.get("plist");
                 }
-                if(!"".equals(sql)) {
+                if (!"".equals(sql)) {
                     todao.execUpdateBatch(sql, plist);
                 }
             }
         }
         Date sqlRunEndTime = new Date();
-        tableConfig.setSqlruntime(String.valueOf(sqlRunEndTime.getTime()-sqlRunBeginTime.getTime())+"ms");
+        tableConfig.setSqlruntime(String.valueOf(sqlRunEndTime.getTime() - sqlRunBeginTime.getTime()) + "ms");
     }
 
     /**
@@ -47,30 +47,39 @@ public class TableSynNormal {
      */
     private List<Map<String, Object>> getSQL(TableConfig tableConfig, NoCloseDataBase fromdao, NoCloseDataBase todao)
             throws Exception {
+        Date sqlQueryBeginTime = new Date();
 
-        //来源表关联关系建立
+        //来源表多表联查SQL组装
         String fromtable = tableConfig.getTablefrom();
-        String[] fromtables = fromtable.split(",");
-        if (fromtables.length == 1) {
-            //单表时不处理，多表时会进行多表关联
-        } else {
-            JSONArray joins = JSONArray.fromObject(tableConfig.getJointable());
-            StringBuffer leftJoin = new StringBuffer();
-            for (Object join1 : joins) {
-                JSONObject join = JSONObject.fromObject(join1);
-                leftJoin.append(" left join ").append(join.getString("name"))
-                        .append(" on ").append(join.getString("on"))
-                        .append(" = ").append(join.getString("dengyu"));
-            }
-            fromtable = fromtable + leftJoin.toString();
+        JSONArray joins = JSONArray.fromObject(tableConfig.getJointable());
+        StringBuffer leftJoin = new StringBuffer();
+        for (Object join1 : joins) {
+            JSONObject join = JSONObject.fromObject(join1);
+            leftJoin.append(" left join ").append(join.getString("name"))
+                    .append(" on ").append(join.getString("on"))
+                    .append(" = ").append(join.getString("dengyu"));
         }
+        fromtable = fromtable + leftJoin.toString();
+//        String[] fromtables = fromtable.split(",");
+//        if (tableConfig.getTablefroms().split(",").length == 1) {
+//            //单表时不处理，多表时会进行多表关联
+//        } else {
+//            JSONArray joins = JSONArray.fromObject(tableConfig.getJointable());
+//            StringBuffer leftJoin = new StringBuffer();
+//            for (Object join1 : joins) {
+//                JSONObject join = JSONObject.fromObject(join1);
+//                leftJoin.append(" left join ").append(join.getString("name"))
+//                        .append(" on ").append(join.getString("on"))
+//                        .append(" = ").append(join.getString("dengyu"));
+//            }
+//            fromtable = fromtable + leftJoin.toString();
+//        }
 
-        //主键
+        //来源表和目标表主键确认
         String[] topk = tableConfig.getTablekey().split(",");
         String[] frompk = new String[topk.length];
         JSONArray columnRelation = JSONArray.fromObject(tableConfig.getRelation());
-
-        for (int i=0;i<topk.length;i++){
+        for (int i = 0; i < topk.length; i++) {
             for (Object aColumnRelation : columnRelation) {
                 JSONObject cjson = JSONObject.fromObject(aColumnRelation);
                 if (topk[i].equals(cjson.getString("columnto"))) {
@@ -79,85 +88,102 @@ public class TableSynNormal {
                 }
             }
         }
-
+        //来源表SQL组装
         StringBuffer fromsql = new StringBuffer();
-        fromsql.append("select DISTINCT ").append(getColumnSQL(tableConfig,"from",fromdao))
+        fromsql.append("select DISTINCT ").append(getColumnSQL(tableConfig, "from", fromdao))
                 .append(" from ").append(fromtable);
-        if(null != tableConfig.getWherefrom() && !"".equals(tableConfig.getWherefrom())){
+        if (null != tableConfig.getWherefrom() && !"".equals(tableConfig.getWherefrom())) {
             fromsql.append(" where 1=1 and (").append(tableConfig.getWherefrom()).append(") ");
         }
         fromsql.append(" order by ");
         for (String pkfrom : frompk) {
-            fromsql.append(addSymbol(pkfrom,fromdao)).append(" asc,");
+            fromsql.append(addSymbol(pkfrom, fromdao)).append(" asc,");
         }
         fromsql.deleteCharAt(fromsql.length() - 1);
-
+        //目标表SQL组装
         StringBuffer tosql = new StringBuffer();
         tosql.append(" select DISTINCT ").append(getColumnSQL(tableConfig, "to", todao))
                 .append(" from ").append(tableConfig.getTableto());
-        if(null != tableConfig.getWhereto() && !"".equals(tableConfig.getWhereto())){
-            fromsql.append(" where 1=1 and (").append(tableConfig.getWhereto()).append(") ");
+        if (null != tableConfig.getWhereto() && !"".equals(tableConfig.getWhereto())) {
+            tosql.append(" where 1=1 and (").append(tableConfig.getWhereto()).append(") ");
         }
         tosql.append(" order by ");
         for (String pkto : topk) {
-            tosql.append(addSymbol(pkto,todao)).append(" asc,");
+            tosql.append(addSymbol(pkto, todao)).append(" asc,");
         }
         tosql.deleteCharAt(tosql.length() - 1);
 
         //查询出需要同步的数据，然后进入比较
-        Date sqlQueryBeginTime = new Date();
-        List<Map<String, Object>> fromlist = fromdao.execQuery(fromsql.toString(), null);
-        List<Map<String, Object>> tolist = todao.execQuery(tosql.toString(), null);
+        List<Map<String, Object>> fromList = fromdao.execQuery(fromsql.toString(), null);
+        List<Map<String, Object>> toList = todao.execQuery(tosql.toString(), null);
         Date sqlQueryEndTime = new Date();
-        tableConfig.setSqlquerytime(String.valueOf(sqlQueryEndTime.getTime()-sqlQueryBeginTime.getTime())+"ms");
+        //第一部分时间记录，从建立SQL到成功查询出所有数据
+        tableConfig.setSqlquerytime(String.valueOf(sqlQueryEndTime.getTime() - sqlQueryBeginTime.getTime()) + "ms");
 
 
+        //分析比较数据差异，组成执行SQL
         Object[] frompkvalue = new Object[frompk.length];
         Object[] topkvalue = new Object[topk.length];
-        //分别存放insert、delete、update的语句
         List<Map<String, Object>> insert = new ArrayList<>();
         List<Map<String, Object>> delete = new ArrayList<>();
         List<Map<String, Object>> update = new ArrayList<>();
 
         Date computeBeginTime = new Date();
         String column = getColumnSQL(tableConfig, "all", null);
-        for (int i = 0; i < fromlist.size(); i++) {
+        for (int i = 0; i < fromList.size(); i++) {
             //先获取主键值
             for (int m = 0; m < frompkvalue.length; m++) {
-                frompkvalue[m] = fromlist.get(i).get(topk[m]);
+                frompkvalue[m] = fromList.get(i).get(topk[m]);
             }
-            for (int j = 0; j < tolist.size(); j++) {
+            for (int j = 0; j < toList.size(); j++) {
                 for (int n = 0; n < topkvalue.length; n++) {
-                    topkvalue[n] = tolist.get(j).get(topk[n]);
+                    topkvalue[n] = toList.get(j).get(topk[n]);
                 }
                 if (isPkEquals(frompkvalue, topkvalue)) {
                     //找到对应list,判断是否相等
-                    if (!isUpdate(fromlist.get(i), tolist.get(j), column)) {
+                    if (!isUpdate(fromList.get(i), toList.get(j), column)) {
                         //如果不同
-                        update.add(fromlist.get(i));
+                        update.add(fromList.get(i));
                     }
-                    fromlist.remove(i--);
-                    tolist.remove(j--);
+                    fromList.remove(i--);
+                    toList.remove(j--);
                     break;
                 }
             }
         }
-        insert.addAll(fromlist);
-        delete.addAll(tolist);
-        Map<String,Object> insertSQL = getInsertSQL(insert, tableConfig,todao);
-        Map<String,Object> deleteSQL = getDeleteSQL(delete, tableConfig,todao);
-        Map<String,Object> updateSQL = getUpdateSQL(update, tableConfig,todao);
+        insert.addAll(fromList);
+        delete.addAll(toList);
+        Map<String, Object> insertSQL;
+        Map<String, Object> deleteSQL;
+        Map<String, Object> updateSQL;
+        //在这里进行同步高级选项配置，是否新增、插入、删除
+        String[] synValue = new String[]{"insert", "delete", "update"};
+        if (tableConfig.getSynvalue().contains(synValue[0])) {
+            insertSQL = getInsertSQL(insert, tableConfig, todao);
+        } else {
+            insertSQL = null;
+        }
+        if (tableConfig.getSynvalue().contains(synValue[1])) {
+            deleteSQL = getDeleteSQL(delete, tableConfig, todao);
+        } else {
+            deleteSQL = null;
+        }
+        if (tableConfig.getSynvalue().contains(synValue[2])) {
+            updateSQL = getUpdateSQL(update, tableConfig, todao);
+        } else {
+            updateSQL = null;
+        }
         Date computeEndTime = new Date();
-        tableConfig.setComputetime(String.valueOf(computeEndTime.getTime()-computeBeginTime.getTime())+"ms");
-
-        List<Map<String,Object>> sqlList = new ArrayList<>();
-        if(insertSQL!=null) {
+        //第二部分时间记录，分析数据时间
+        tableConfig.setComputetime(String.valueOf(computeEndTime.getTime() - computeBeginTime.getTime()) + "ms");
+        List<Map<String, Object>> sqlList = new ArrayList<>();
+        if (insertSQL != null) {
             sqlList.add(insertSQL);
         }
-        if(deleteSQL!=null) {
+        if (deleteSQL != null) {
             sqlList.add(deleteSQL);
         }
-        if(updateSQL!=null) {
+        if (updateSQL != null) {
             sqlList.add(updateSQL);
         }
         return sqlList;
@@ -246,17 +272,17 @@ public class TableSynNormal {
             return false;
         }
         boolean flag = true;
-        Object a,b;
+        Object a, b;
         for (int i = 0; i < str1.length; i++) {
             a = str1[i];
             b = str2[i];
-            if(null != a && null != b){
-                if(!a.toString().trim().equals(b.toString().trim())) {
+            if (null != a && null != b) {
+                if (!a.toString().trim().equals(b.toString().trim())) {
                     flag = false;
                 }
-            }else if( a==null && b == null){
+            } else if (a == null && b == null) {
                 //相等
-            }else{
+            } else {
                 flag = false;
             }
         }
@@ -269,73 +295,81 @@ public class TableSynNormal {
     private static boolean isUpdate(Map<String, Object> fromMap, Map<String, Object> toMap, String column) throws Exception {
         boolean flag = true;
         String[] tos = column.split(",");
-        Object a,b;
+        Object a, b;
         for (String to : tos) {
             a = fromMap.get(to);
             b = toMap.get(to);
-            if(null != a && null != b){
-                if(!a.toString().trim().equals(b.toString().trim())) {
+            if (null != a && null != b) {
+                if (!a.toString().trim().equals(b.toString().trim())) {
                     flag = false;
                 }
-            }else if( a==null && b == null){
+            } else if (a == null && b == null) {
                 //相等
-            }else{
+            } else {
                 flag = false;
             }
         }
         return flag;
     }
 
-    private static Map<String,Object> getInsertSQL(List<Map<String, Object>> insert, TableConfig tableConfig,NoCloseDataBase dao){
-        Map<String,Object> rMap = new HashMap<>(4);
+    private static Map<String, Object> getInsertSQL(List<Map<String, Object>> insert, TableConfig tableConfig, NoCloseDataBase dao) {
+        Map<String, Object> rMap = new HashMap<>(4);
         List<Object[]> plist = new ArrayList<>();
         if (insert != null && insert.size() > 0) {
             //先准备sql
             StringBuffer insertSql = new StringBuffer();
-            String column = getColumnSQL(tableConfig,"to",dao);
+            String column = getColumnSQL(tableConfig, "to", dao);
             insertSql.append("insert into ").append(tableConfig.getTableto()).append(" (").append(column).append(") values (");
-            for(int i=0;i<column.split(",").length;i++){
+            for (int i = 0; i < column.split(",").length; i++) {
                 insertSql.append("?,");
             }
-            insertSql.deleteCharAt(insertSql.length()-1);
+            insertSql.deleteCharAt(insertSql.length() - 1);
             insertSql.append(")");
             //准备参数
 
             for (Map<String, Object> anInsert : insert) {
-                plist.add(getObjectValue(anInsert,getColumnSQL(tableConfig, "all", null)));
+                plist.add(getObjectValue(anInsert, getColumnSQL(tableConfig, "all", null)));
             }
-            rMap.put("sql",insertSql.toString());
-            rMap.put("plist",plist);
+            rMap.put("sql", insertSql.toString());
+            rMap.put("plist", plist);
             return rMap;
-        }else{
+        } else {
             return null;
         }
     }
-    private static Map<String,Object> getDeleteSQL(List<Map<String, Object>> delete, TableConfig tableConfig,NoCloseDataBase dao){
-        Map<String,Object> rMap = new HashMap<>(4);
+
+    private static Map<String, Object> getDeleteSQL(List<Map<String, Object>> delete, TableConfig tableConfig, NoCloseDataBase dao) {
+        Map<String, Object> rMap = new HashMap<>(4);
         String[] topk = tableConfig.getTablekey().split(",");
-        if(delete!=null && delete.size()>0){
+        if (delete != null && delete.size() > 0) {
+            List<Object[]> plist = new ArrayList<>();
             StringBuffer deleteSql = new StringBuffer();
-            deleteSql.append(" delete from ").append(tableConfig.getTableto()).append(" where 1=2 ");
-            for (Map<String, Object> aDelete : delete) {
-                deleteSql.append(" or ( 1=1 ");
-                for (String aTopk : topk) {
-                    deleteSql.append(" and ").append(addSymbol(aTopk, dao))
-                            .append("='").append(aDelete.get(aTopk).toString()).append("' ");
-                }
-                deleteSql.append(")");
+            deleteSql.append(" delete from ").append(tableConfig.getTableto()).append(" where 1=1 ");
+            for (String aTopk : topk) {
+                deleteSql.append(" and ").append(addSymbol(aTopk, dao)).append("=?,");
             }
-            rMap.put("sql",deleteSql.toString());
-            rMap.put("plist",null);
+            if (deleteSql.length() > 0) {
+                deleteSql.deleteCharAt(deleteSql.length() - 1);
+            }
+            for (Map<String, Object> aDelete : delete) {
+                Object[] para = new Object[topk.length];
+                for (int i = 0; i < topk.length; i++) {
+                    para[i] = aDelete.get(topk[i]).toString();
+                }
+                plist.add(para);
+            }
+            rMap.put("sql", deleteSql.toString());
+            rMap.put("plist", plist);
             return rMap;
-        }else{
+        } else {
             return null;
         }
     }
-    private static Map<String,Object> getUpdateSQL(List<Map<String, Object>> update, TableConfig tableConfig,NoCloseDataBase dao){
-        Map<String,Object> rMap = new HashMap<>(4);
+
+    private static Map<String, Object> getUpdateSQL(List<Map<String, Object>> update, TableConfig tableConfig, NoCloseDataBase dao) {
+        Map<String, Object> rMap = new HashMap<>(4);
         List<Object[]> plist = new ArrayList<>();
-        if(update!=null && update.size() > 0){
+        if (update != null && update.size() > 0) {
             StringBuffer updateSql = new StringBuffer();
             String[] columns = getColumnSQL(tableConfig, "all", null).split(",");
             String[] typeColumns = getColumnSQL(tableConfig, "to", dao).split(",");
@@ -345,7 +379,7 @@ public class TableSynNormal {
             for (String typeColumn : typeColumns) {
                 updateSql.append(typeColumn).append(" = ?,");
             }
-            updateSql.deleteCharAt(updateSql.length()-1);
+            updateSql.deleteCharAt(updateSql.length() - 1);
             updateSql.append(" where 1=1");
             for (String aTopk : topk) {
                 updateSql.append(" and ").append(addSymbol(aTopk, dao)).append(" = ?");
@@ -359,15 +393,15 @@ public class TableSynNormal {
                     para[n] = colValue;
                 }
                 for (int k = typeColumns.length; k < typeColumns.length + topk.length; k++) {
-                    colValue = anUpdate.get(topk[k-typeColumns.length]);
+                    colValue = anUpdate.get(topk[k - typeColumns.length]);
                     para[k] = colValue;
                 }
                 plist.add(para);
             }
-            rMap.put("sql",updateSql.toString());
-            rMap.put("plist",plist);
+            rMap.put("sql", updateSql.toString());
+            rMap.put("plist", plist);
             return rMap;
-        }else{
+        } else {
             return null;
         }
     }
@@ -380,7 +414,7 @@ public class TableSynNormal {
         Object[] obj = new Object[str.length];
         for (int i = 0; i < str.length; i++) {
             if (str[i].indexOf(".") > 0) {
-                str[i] = str[i].substring(str[i].lastIndexOf(".")+1, str[i].length());
+                str[i] = str[i].substring(str[i].lastIndexOf(".") + 1, str[i].length());
             }
             obj[i] = rMap.get(str[i]);
         }

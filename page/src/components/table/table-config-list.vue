@@ -22,6 +22,8 @@
       </el-table-column>
       <el-table-column prop="name" label="任务名称" width="180">
       </el-table-column>
+      <el-table-column prop="tableto" label="目标表">
+      </el-table-column>
       <el-table-column prop="lasttime" label="上次同步时间" width="180">
       </el-table-column>
       <el-table-column prop="timecost" label="上次同步耗时" width="100">
@@ -107,16 +109,18 @@
           let para = {
             id: row.id,
           };
+          this.tableLoading=true;
           testTableSyn(para).then((res) => {
+            this.tableLoading=false;
             if (res.code === '0') {
               this.$message.success(res.msg);
-              this.getTableConfigList();
             } else {
               this.$message.error(res.msg);
             }
+            this.getTableConfigList();
           });
         }).catch(() => {
-          //取消操作
+          this.tableLoading=false;
         });
       },
       deleteTableConfigBtn: function (index, row) {

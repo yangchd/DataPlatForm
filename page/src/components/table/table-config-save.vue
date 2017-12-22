@@ -1,214 +1,215 @@
 <template>
   <div id="table-config-save">
     <!--新增界面-->
-    <el-dialog title="同步配置" :visible.sync="tableConfigDialogVisible" :center="is_center" width="80%"
+    <el-dialog :visible.sync="tableConfigDialogVisible" :center="is_center" width="70%" top="10vh"
                :close-on-click-modal="false">
       <el-form ref="tableConfigForm" :model="tableConfigForm" label-width="80px" :rules="tableConfigForm">
-        <!--上部基本-->
-        <el-row>
-          <el-col :span="24" v-if="false">
-            <el-form-item label="id">
-              <el-input v-model="tableConfigForm.id" placeholder="同步配置id"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="名称">
-              <el-input v-model="tableConfigForm.name" placeholder="同步任务名称"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="描述">
-              <el-input v-model="tableConfigForm.description" placeholder="同步任务描述"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <!--中部数据源和表选择-->
-        <el-row>
-          <el-col :span="8">
-            <el-form-item label="目标库">
-              <el-select v-model="tableConfigForm.datato" placeholder="同步任务目标数据库" size="large" :disabled="addLock"
-                         @change="dataSourceChange(tableConfigForm.datato,'datato')" filterable clearable>
-                <el-option
-                  v-for="item in datasource"
-                  :label="item.name" :key="item.id" :value="item.id">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="目标表">
-              <el-select v-model="tableConfigForm.tableto" placeholder="同步任务目标表" size="large" :disabled="addLock"
-                         @change="tableToChange"
-                         filterable clearable>
-                <el-option
-                  v-for="item in tableConfigForm.tablenameto"
-                  :label="item.table_name" :key="item.table_name" :value="item.table_name">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8"></el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="8">
-            <el-form-item label="来源库">
-              <el-select v-model="tableConfigForm.datafrom" placeholder="同步任务来源数据库" size="large" :disabled="addLock"
-                         @change="dataSourceChange(tableConfigForm.datafrom,'datafrom')" filterable clearable>
-                <el-option
-                  v-for="item in datasource"
-                  :label="item.name" :key="item.id" :value="item.id">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="来源表">
-              <el-select v-model="tableConfigForm.tablefrom" placeholder="同步任务来源表" size="large" :disabled="addLock"
-                         @change="tableFromChange"
-                         filterable clearable>
-                <el-option
-                  v-for="item in tableConfigForm.tablenamefrom"
-                  :label="item.table_name" :key="item.table_name" :value="item.table_name">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8" style="text-align: center">
-            <el-button type="primary" @click="tableConfigJoinBtn" :disabled="addLock">left join</el-button>
-            <el-button type="primary" @click="tableConfigResetBtn" :disabled="editLock">重置</el-button>
-            <el-button type="primary" @click="tableConfigConfirmBtn" :disabled="editLock">确认</el-button>
-            <el-button type="primary" @click="tableConfigSettingBtn">高级</el-button>
-          </el-col>
-        </el-row>
-
-        <!--左连接部分代码-->
-        <el-row>
-          <el-col :span="24" v-for="jointables in tableConfigForm.jointable" :key="jointables.name">
-            <el-col :span="6">
-              <el-form-item label="left join">
-                <el-select v-model="jointables.name" placeholder="连接表" size="large" :disabled="addLock" filterable
-                           @change="tableFromChange">
-                  <el-option
-                    v-for="item in tableConfigForm.tablenamefrom"
-                    :label="item.table_name" :key="item.table_name" :value="item.table_name">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="on">
-                <el-select v-model="jointables.on" placeholder="左表列" size="large" :disabled="addLock" filterable>
-                  <el-option
-                    v-for="item in tableConfigForm.columnfrom"
-                    :label="item.column_name" :key="item.column_name" :value="item.column_name">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
-              <el-form-item label="=">
-                <el-select v-model="jointables.dengyu" placeholder="右表列" size="large" :disabled="addLock" filterable>
-                  <el-option
-                    v-for="item in tableConfigForm.columnfrom"
-                    :label="item.column_name" :key="item.column_name" :value="item.column_name">
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6"></el-col>
-          </el-col>
-        </el-row>
-
-        <!--高级选项-->
-        <el-row>
-          <el-col :span="24" v-if="AddSetting">
+        <el-tabs v-model="tableConfigForm.tableConfigTabs" @tab-click="">
+          <el-tab-pane label="常规配置" name="first">
+            <!--上部基本-->
             <el-row>
+              <el-col :span="24" v-if="false">
+                <el-form-item label="id">
+                  <el-input v-model="tableConfigForm.id" placeholder="同步配置id"></el-input>
+                </el-form-item>
+              </el-col>
               <el-col :span="12">
-                <el-form-item label="同步选项">
-                  <el-checkbox-group v-model="tableConfigForm.synvalue">
-                    <el-checkbox label="update"></el-checkbox>
-                    <el-checkbox label="insert"></el-checkbox>
-                    <el-checkbox label="delete"></el-checkbox>
-                  </el-checkbox-group>
+                <el-form-item label="名称">
+                  <el-input v-model="tableConfigForm.name" placeholder="同步任务名称"></el-input>
                 </el-form-item>
               </el-col>
-              <el-col :span="12"></el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="6">
-                <el-form-item label="开启日志">
-                  <el-switch
-                    v-model="tableConfigForm.logflag"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
-                  </el-switch>
-                </el-form-item>
-              </el-col>
-              <el-col :span="6">
-                <el-form-item label="出错继续">
-                  <el-switch
-                    v-model="tableConfigForm.errorflag"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949">
-                  </el-switch>
-                </el-form-item>
-              </el-col>
-              <el-col :span="12"></el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="24">
-                <el-form-item label="where">
-                  <el-input v-model="tableConfigForm.whereto" placeholder="目标表where值限定"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="24">
-                <el-form-item label="where">
-                  <el-input v-model="tableConfigForm.wherefrom" placeholder="来源表where值限定"></el-input>
+              <el-col :span="12">
+                <el-form-item label="描述">
+                  <el-input v-model="tableConfigForm.description" placeholder="同步任务描述"></el-input>
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-row style="text-align: center">
-              <el-button @click="backLeftJoinBtn">完成高级设置</el-button>
-            </el-row>
-          </el-col>
-        </el-row>
 
-        <!--列配置-->
-        <el-row v-if="columnRelationFlag" v-for="relations in tableConfigForm.relation" :key="relations.column">
-          <el-col :span="6">
-            <el-form-item label="列">
-              <el-input v-model="relations.columnto" disabled :value="relations.columnto"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="匹配">
-              <el-select v-model="relations.columnfrom" placeholder="选择需要同步的列" size="large"
-                         @change="" filterable clearable>
-                <el-option
-                  v-for="item in tableConfigForm.columnfrom"
-                  :label="item.column_name" :key="item.column_name" :value="item.column_name">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="默认选项">
-              <el-select v-model="relations.defaulttype" placeholder="选择需要同步的列" size="large"
-                         @change="" filterable>
-                <el-option
-                  v-for="item in defaulttypeSelect"
-                  :label="item.name" :key="item.value" :value="item.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item label="默认值">
-              <el-input v-model="relations.defaultvalue" placeholder="请输入默认值"></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
+            <!--中部数据源和表选择-->
+            <el-row>
+              <el-col :span="8">
+                <el-form-item label="目标库">
+                  <el-select v-model="tableConfigForm.datato" placeholder="同步任务目标数据库" size="large" :disabled="addLock"
+                             @change="dataSourceChange(tableConfigForm.datato,'datato')" filterable clearable>
+                    <el-option
+                      v-for="item in datasource"
+                      :label="item.name" :key="item.id" :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="目标表">
+                  <el-select v-model="tableConfigForm.tableto" placeholder="同步任务目标表" size="large" :disabled="addLock"
+                             @change="tableToChange"
+                             filterable clearable>
+                    <el-option
+                      v-for="item in tableConfigForm.tablenameto"
+                      :label="item.table_name" :key="item.table_name" :value="item.table_name">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8"></el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="8">
+                <el-form-item label="来源库">
+                  <el-select v-model="tableConfigForm.datafrom" placeholder="同步任务来源数据库" size="large" :disabled="addLock"
+                             @change="dataSourceChange(tableConfigForm.datafrom,'datafrom')" filterable clearable>
+                    <el-option
+                      v-for="item in datasource"
+                      :label="item.name" :key="item.id" :value="item.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="来源表">
+                  <el-select v-model="tableConfigForm.tablefrom" placeholder="同步任务来源表" size="large" :disabled="addLock"
+                             @change="tableFromChange"
+                             filterable clearable>
+                    <el-option
+                      v-for="item in tableConfigForm.tablenamefrom"
+                      :label="item.table_name" :key="item.table_name" :value="item.table_name">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="8" style="text-align: center">
+                <el-button type="primary" @click="tableConfigJoinBtn" :disabled="addLock">left join</el-button>
+                <el-button type="primary" @click="tableConfigResetBtn" :disabled="editLock">重置</el-button>
+                <el-button type="primary" @click="tableConfigConfirmBtn" :disabled="editLock">确认</el-button>
+              </el-col>
+            </el-row>
+
+            <!--左连接部分代码-->
+            <el-row>
+              <el-col :span="24" v-for="jointables in tableConfigForm.jointable" :key="jointables.name">
+                <el-col :span="6">
+                  <el-form-item label="left join">
+                    <el-select v-model="jointables.name" placeholder="连接表" size="large" :disabled="addLock" filterable
+                               @change="tableFromChange">
+                      <el-option
+                        v-for="item in tableConfigForm.tablenamefrom"
+                        :label="item.table_name" :key="item.table_name" :value="item.table_name">
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="on">
+                    <el-select v-model="jointables.on" placeholder="左表列" size="large" :disabled="addLock" filterable>
+                      <el-option
+                        v-for="item in tableConfigForm.columnfrom"
+                        :label="item.column_name" :key="item.column_name" :value="item.column_name">
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="=">
+                    <el-select v-model="jointables.dengyu" placeholder="右表列" size="large" :disabled="addLock"
+                               filterable>
+                      <el-option
+                        v-for="item in tableConfigForm.columnfrom"
+                        :label="item.column_name" :key="item.column_name" :value="item.column_name">
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6"></el-col>
+              </el-col>
+            </el-row>
+            <!--列配置-->
+            <el-row v-if="columnRelationFlag" v-for="relations in tableConfigForm.relation" :key="relations.column">
+              <el-col :span="6">
+                <el-form-item label="列">
+                  <el-input v-model="relations.columnto" disabled :value="relations.columnto"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="匹配">
+                  <el-select v-model="relations.columnfrom" placeholder="选择需要同步的列" size="large"
+                             @change="" filterable clearable>
+                    <el-option
+                      v-for="item in tableConfigForm.columnfrom"
+                      :label="item.column_name" :key="item.column_name" :value="item.column_name">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="默认选项">
+                  <el-select v-model="relations.defaulttype" placeholder="选择需要同步的列" size="large"
+                             @change="" filterable>
+                    <el-option
+                      v-for="item in defaulttypeSelect"
+                      :label="item.name" :key="item.value" :value="item.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="默认值">
+                  <el-input v-model="relations.defaultvalue" placeholder="请输入默认值"></el-input>
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="高级配置" name="second">
+            <!--高级选项-->
+            <el-row>
+              <el-col :span="24" v-if="AddSetting">
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="同步选项">
+                      <el-checkbox-group v-model="tableConfigForm.synvalue">
+                        <el-checkbox label="update"></el-checkbox>
+                        <el-checkbox label="insert"></el-checkbox>
+                        <el-checkbox label="delete"></el-checkbox>
+                      </el-checkbox-group>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12"></el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="6">
+                    <el-form-item label="开启日志">
+                      <el-switch
+                        v-model="tableConfigForm.logflag"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949">
+                      </el-switch>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="6">
+                    <el-form-item label="出错继续">
+                      <el-switch
+                        v-model="tableConfigForm.errorflag"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949">
+                      </el-switch>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12"></el-col>
+                </el-row>
+                <el-row>
+                  <el-col :span="24">
+                    <el-form-item label="where">
+                      <el-input v-model="tableConfigForm.whereto" placeholder="目标表where值限定"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-form-item label="where">
+                      <el-input v-model="tableConfigForm.wherefrom" placeholder="来源表where值限定"></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+          </el-tab-pane>
+        </el-tabs>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancelTableConfigBtn">取消</el-button>
@@ -230,7 +231,7 @@
         /**列配置**/
         columnRelationFlag: false,
         /**高级设置**/
-        AddSetting: false,
+        AddSetting: true,
         /**锁定部分配置**/
         addLock: false,
         editLock: false,
@@ -239,7 +240,7 @@
         /**默认选项**/
         defaulttypeSelect: [{name: '无默认值', value: '0'}, {name: '列值为空时默认', value: '1'}, {name: '强制默认', value: '2'}],
         /**新增初始化值**/
-        initTableConfigDialog:{
+        initTableConfigDialog: {
           id: '',
           name: '',
           description: '',
@@ -247,6 +248,7 @@
           tableto: '',
           datafrom: '',
           tablefrom: '',
+          tablefroms: '',
           jointable: [],
           //列配置
           relation: [],
@@ -261,6 +263,7 @@
           errorflag: false,
           whereto: '',
           wherefrom: '',
+          tableConfigTabs: 'first',
         },
       }
     },
@@ -272,13 +275,12 @@
         this.tableConfigDialogVisible = true;
         if (!("undefined" === typeof(val))) {
           this.columnRelationFlag = true;
-          this.AddSetting = false;
           this.addLock = true;
           this.editLock = true;
           this.tableConfigForm = val;
-        }else {
+          this.tableConfigForm.tableConfigTabs = 'first';
+        } else {
           this.columnRelationFlag = false;
-          this.AddSetting = false;
           this.addLock = false;
           this.editLock = false;
           this.tableConfigForm = this.initTableConfigDialog;
@@ -312,7 +314,7 @@
         let para = {
           id: this.tableConfigForm.datato,
           name: this.tableConfigForm.tableto,
-          type:'to',
+          type: 'to',
         };
         getColumnList(para).then((res) => {
           if (res.code === "0") {
@@ -344,8 +346,9 @@
         let para = {
           id: this.tableConfigForm.datafrom,
           name: name.toString(),
-          type:'from',
+          type: 'from',
         };
+        this.tableConfigForm.tablefroms=name.toString();
         getColumnList(para).then((res) => {
           if (res.code === "0") {
             this.tableConfigForm.columnfrom = res.data;
@@ -410,32 +413,6 @@
           this.tableConfigForm.relation.push(relation);
         }
         this.columnRelationFlag = true;
-      },
-      /**
-       * 高级设置按钮
-       */
-      tableConfigSettingBtn: function () {
-        this.$confirm('高级设置请小心操作？', '提示', {
-          confirmButtonText: '开启',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.AddSetting = true;
-          this.columnRelationFlag = false;
-        }).catch(() => {
-          //取消操作
-        });
-      },
-      /**
-       * 高级设置返回按钮
-       */
-      backLeftJoinBtn: function () {
-        this.$confirm('返回修改其他选项？', '提示', {}).then(() => {
-          this.AddSetting = false;
-          this.columnRelationFlag = true;
-        }).catch(() => {
-          //取消操作
-        });
       },
       /**
        * 新增部分取消按钮

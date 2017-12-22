@@ -25,6 +25,7 @@ public class TableConfig {
     private String tableto;
     private String tablekey;
     private String tablefrom;
+    private String tablefroms;
     @Column(length = 2000)
     private String jointable;
     @Column(length = 2000)
@@ -118,6 +119,14 @@ public class TableConfig {
 
     public void setTablefrom(String tablefrom) {
         this.tablefrom = tablefrom;
+    }
+
+    public String getTablefroms() {
+        return tablefroms;
+    }
+
+    public void setTablefroms(String tablefroms) {
+        this.tablefroms = tablefroms;
     }
 
     public String getJointable() {
@@ -267,6 +276,7 @@ public class TableConfig {
                 ", tableto='" + tableto + '\'' +
                 ", tablekey='" + tablekey + '\'' +
                 ", tablefrom='" + tablefrom + '\'' +
+                ", tablefroms='" + tablefroms + '\'' +
                 ", jointable='" + jointable + '\'' +
                 ", whereto='" + whereto + '\'' +
                 ", wherefrom='" + wherefrom + '\'' +

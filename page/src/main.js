@@ -12,6 +12,7 @@ Vue.use(VueRouter);
 
 //定义路由
 const router = new VueRouter({
+  mode:'history',
   routes
 });
 //定义拦截器

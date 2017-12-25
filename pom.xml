@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.yangchd</groupId>
-	<artifactId>data</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<artifactId>platform</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>war</packaging>
 
-	<name>data</name>
+	<name>platform</name>
 	<description>a platform for data</description>
 
 	<parent>
@@ -33,6 +33,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.nekohtml</groupId>
+			<artifactId>nekohtml</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>net.sf.json-lib</groupId>
@@ -51,6 +59,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!--war包-->
+		<!--<dependency>-->
+			<!--<groupId>org.springframework.boot</groupId>-->
+			<!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
 	</dependencies>
 
 	<build>

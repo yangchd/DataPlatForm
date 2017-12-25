@@ -9,7 +9,7 @@
         <module name="DataPlatform" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8">
       <module name="DataPlatform" target="1.8" />
     </bytecodeTargetLevel>
   </component>

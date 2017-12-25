@@ -35,7 +35,7 @@ public class TableConfig {
     /*****************列配置***************/
     @Column(length = 2000)
     private String columnto;
-    @Column(length = 2000)
+    @Column(length = 5000)
     private String columnfrom;
     @Column(length = 2000)
     private String relation;

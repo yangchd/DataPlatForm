@@ -28,7 +28,7 @@ let routes = [
     children: [
       {path: '/datasource',name:'数据源', component: DataSource},
       {path: '/table',name:'同步信息', component: TableConfig},
-      {path: '/developing',name:'日志管理', component: Developing},
+      {path: '/statistics',name:'同步统计', component: Developing},
     ],
   },{
     path: '/',
@@ -37,7 +37,7 @@ let routes = [
     component: Home,
     // hidden:true,
     children: [
-      {path: '/developing',name:'任务列表', component: Developing},
+      {path: '/quartz',name:'任务列表', component: Developing},
     ],
   },{
     path: '/',
@@ -46,7 +46,7 @@ let routes = [
     iconCls: 'el-icon-document',//图标样式class
     component: Home,
     children: [
-      {path: '/developing',name:'控制台', component: Developing},
+      {path: '/console',name:'控制台', component: Developing},
     ],
   },
 ];

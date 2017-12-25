@@ -206,7 +206,16 @@ public class TableSynNormal {
             } else if ("1".equals(relation.getString("defaulttype"))) {
 
             } else if ("2".equals(relation.getString("defaulttype"))) {
-
+                String columnto = relation.getString("columnto");
+                if ("from".equals(type)) {
+                    //在这里对columnto做一下处理，as后面不允许带表名称
+                    sb.append(relation.getString("defaultvalue")).append(" as ")
+                            .append(addSymbol(columnto.split("\\.")[0], dao)).append(",");
+                } else if ("to".equals(type)) {
+                    sb.append(addSymbol(columnto, dao)).append(",");
+                } else {
+                    sb.append(columnto).append(",");
+                }
             }
         }
         if (sb.length() > 0) {

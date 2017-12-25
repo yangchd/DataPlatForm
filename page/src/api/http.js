@@ -5,7 +5,7 @@ import qs from 'qs'
 
 const baseUrl = '/';
 // const baseUrl = 'http://localhost:9001';
-const timeout = 10000;
+const timeout = 30000;
 
 axios.interceptors.request.use(config => {
   return config

@@ -3,9 +3,7 @@ package com.yangchd.data.controller;
 import com.yangchd.data.service.user.IUserService;
 import com.yangchd.data.table.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -26,7 +24,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/user")
-    public Map<String, Object> getLogin(@RequestBody User user) {
+    public Map<String, Object> getLogin(User user) {
         Map<String, Object> rMap = new HashMap<>(4);
         try {
             rMap = userService.checkLogin(user);

@@ -60,20 +60,6 @@ public class TableSynNormal {
                     .append(" = ").append(join.getString("dengyu"));
         }
         fromtable = fromtable + leftJoin.toString();
-//        String[] fromtables = fromtable.split(",");
-//        if (tableConfig.getTablefroms().split(",").length == 1) {
-//            //单表时不处理，多表时会进行多表关联
-//        } else {
-//            JSONArray joins = JSONArray.fromObject(tableConfig.getJointable());
-//            StringBuffer leftJoin = new StringBuffer();
-//            for (Object join1 : joins) {
-//                JSONObject join = JSONObject.fromObject(join1);
-//                leftJoin.append(" left join ").append(join.getString("name"))
-//                        .append(" on ").append(join.getString("on"))
-//                        .append(" = ").append(join.getString("dengyu"));
-//            }
-//            fromtable = fromtable + leftJoin.toString();
-//        }
 
         //来源表和目标表主键确认
         String[] topk = tableConfig.getTablekey().split(",");

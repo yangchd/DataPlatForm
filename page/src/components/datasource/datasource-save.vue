@@ -152,8 +152,6 @@
           } else {
             this.$message.error(res.msg);
           }
-        }).catch(() => {
-          this.testConLoading = false;
         });
       },
       /**
@@ -176,8 +174,6 @@
                 } else {
                   this.$message.error(res.msg);
                 }
-              }).catch(() => {
-                this.saveFormLoading = false;
               });
             }).catch(() => {
               //取消操作

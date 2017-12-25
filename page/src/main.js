@@ -16,7 +16,6 @@ const router = new VueRouter({
 });
 //定义拦截器
 router.beforeEach((to, from, next) => {
-  console.log('beforeEach');
   if (to.path === '/login') {
     sessionStorage.removeItem('user');
   }

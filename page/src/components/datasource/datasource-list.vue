@@ -70,11 +70,12 @@
         };
         this.dataSourceTableLoading = true;
         getDataSourceList(para).then((res) => {
-          this.dataSourceTable = res.data;
           this.dataSourceTableLoading = false;
-        }).catch((res) => {
-          this.dataSourceTableLoading = false;
-          this.$message.error(res);
+          if (res.code === '0') {
+            this.dataSourceTable = res.data;
+          } else {
+            this.$message.error(res.msg);
+          }
         });
       },
       //查询按钮
@@ -92,7 +93,9 @@
        */
       testDataSourceBtn: function (index, row) {
         let para = Object.assign({}, row);
+        this.dataSourceTableLoading = true;
         testConnection(para).then((res) => {
+          this.dataSourceTableLoading = false;
           if (res.code === '0') {
             this.$message.success(res.msg);
           } else {
@@ -114,7 +117,9 @@
       deleteDataSourceBtn: function (index, row) {
         this.$confirm('确认删除吗？', '提示', {}).then(() => {
           let para = Object.assign({}, row);
+          this.dataSourceTableLoading = true;
           deleteDataSource(para).then((res) => {
+            this.dataSourceTableLoading = false;
             if (res.code === '0') {
               this.$message.success(res.msg);
               this.getDataSourceTableList();

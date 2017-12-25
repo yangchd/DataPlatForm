@@ -8,7 +8,7 @@
     <el-form-item prop="password" label="密码">
       <el-input type="password" v-model="loginForm.password" auto-complete="off" placeholder="密码"></el-input>
     </el-form-item>
-    <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
+    <!--<el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>-->
     <el-form-item style="width:100%;" label-width="0px">
       <el-button type="primary" style="width:100%;" @click="submitForm('loginForm')" :loading="logining">登录
       </el-button>
@@ -17,7 +17,8 @@
 </template>
 
 <script>
-  import {requestLogin, userLogin} from '../api/api';
+  import {userLogin} from '../api/api';
+  import http from "../api/http";
   export default {
     data() {
       let validateName = (rule, value, callback) => {
@@ -42,7 +43,6 @@
         },
         rules: {
           username: [
-            //自定义校验方法
             {validator: validateName, trigger: 'blur'},
           ],
           password: [
@@ -61,18 +61,15 @@
               code: this.loginForm.username,
               password: this.loginForm.password
             };
-            console.log(loginParams);
             userLogin(loginParams).then(res => {
               this.logining = false;
-              if (res.code === '0'){
+              if (res.code === '0') {
                 this.$message.success("登录成功！");
                 sessionStorage.setItem('user', JSON.stringify(loginParams));
                 this.$router.push({path: '/datasource'});
-              }else {
+              } else {
                 this.$message.error(res.msg);
               }
-            }).catch(()=>{
-              this.$message.error(res);
             });
           } else {
             return false;

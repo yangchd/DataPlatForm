@@ -1,44 +1,28 @@
-import axios from 'axios';
 
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-let base = 'http://localhost:9001';
+import http from "./http";
 
-/**
- * 登录请求
- */
-export const userLogin = params => {
-  return axios.post(`${base}/login/user`, params).then(
-    res => res.data
-  );
-};
-// export const userLogin = params => { return axios.get(`${base}/login/user`, {params:params}).then(res => res.data); };
+/**登录**/
+export const userLogin = params => {return http.post('/login/user',params).then(res => res);};
 
-//获取数据列表请求
-export const getDataSourceList = params => {return axios.get(`${base}/datasource/list`, {params:params}).then(res => res.data);};
 
-//测试数据源请求
-export const testConnection = params => {return axios.get(`${base}/datasource/test`,{params:params}).then(res => res.data);};
+/**获取数据源列表**/
+export const getDataSourceList = params => {return http.get('/datasource/list', params).then(res => res);};
+/**数据源连接测试**/
+export const testConnection = params => {return http.post('/datasource/test',params).then(res => res);};
+/**保存数据源**/
+export const saveDataSource = params => {return http.post('/datasource/save',params).then(res => res);};
+/**删除数据源**/
+export const deleteDataSource = params => {return http.post('/datasource/delete',params).then(res => res);};
 
-//保存数据源请求
-export const saveDataSource = params => {return axios.get(`${base}/datasource/save`,{params:params}).then(res => res.data);};
-
-//删除数据源请求
-export const deleteDataSource = params => {return axios.get(`${base}/datasource/delete`,{params:params}).then(res => res.data);};
-
-//获取表列表请求
-export const getTableList = params => {return axios.get(`${base}/table/list`, {params:params}).then(res => res.data);};
-
-//根据数据源获取表名称
-export const getTableNameList = params => {return axios.get(`${base}/table/name`, {params:params}).then(res => res.data);};
-
-//根据数据源获取列名称
-export const getColumnList = params => {return axios.get(`${base}/table/column`, {params:params}).then(res => res.data);};
-
-//保存同步配置
-export const saveTableConfig = params => {return axios.get(`${base}/table/save`, {params:params}).then(res => res.data);};
-
-//删除同步配置
-export const deleteTableConfig = params => {return axios.get(`${base}/table/delete`, {params:params}).then(res => res.data);};
-
-//测试同步
-export const testTableSyn = params => {return axios.get(`${base}/table/test`, {params:params}).then(res => res.data);};
+/**获取表配置列表**/
+export const getTableList = params => {return http.get('/table/list', params).then(res => res);};
+/**获取数据源下所有表**/
+export const getTableNameList = params => {return http.get('/table/name', params).then(res => res);};
+/**获取表中所有列名称**/
+export const getColumnList = params => {return http.get('/table/column', params).then(res => res);};
+/**保存表配置**/
+export const saveTableConfig = params => {return http.post('/table/save', params).then(res => res);};
+/**删除表配置**/
+export const deleteTableConfig = params => {return http.post('/table/delete', params).then(res => res);};
+/**同步测试**/
+export const testTableSyn = params => {return http.post('/table/test', params).then(res => res);};

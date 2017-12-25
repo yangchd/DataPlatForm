@@ -74,12 +74,13 @@
         };
         this.tableLoading = true;
         getTableList(para).then((res) => {
-          this.jsonToArray(res);
-          this.table = res.data;
           this.tableLoading = false;
-        }).catch((res) => {
-          this.tableLoading = false;
-          this.$message.error(res);
+          if(res.code === '0'){
+            this.jsonToArray(res);
+            this.table = res.data;
+          }else {
+              this.$message.error(res.msg);
+          }
         });
       },
       /**
@@ -128,7 +129,9 @@
           let para = {
             id: row.id,
           };
+          this.tableLoading=true;
           deleteTableConfig(para).then((res) => {
+            this.tableLoading=false;
             if (res.code === '0') {
               this.$message.success(res.msg);
               this.getTableConfigList();

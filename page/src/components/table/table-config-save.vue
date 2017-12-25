@@ -30,7 +30,7 @@
               <el-col :span="8">
                 <el-form-item label="目标库">
                   <el-select v-model="tableConfigForm.datato" placeholder="同步任务目标数据库" size="large" :disabled="addLock"
-                             @change="dataSourceChange(tableConfigForm.datato,'datato')" filterable clearable>
+                             @change="dataSourceChange(tableConfigForm.datato,'datato')" filterable>
                     <el-option
                       v-for="item in datasource"
                       :label="item.name" :key="item.id" :value="item.id">
@@ -42,7 +42,7 @@
                 <el-form-item label="目标表">
                   <el-select v-model="tableConfigForm.tableto" placeholder="同步任务目标表" size="large" :disabled="addLock"
                              @change="tableToChange"
-                             filterable clearable>
+                             filterable>
                     <el-option
                       v-for="item in tableConfigForm.tablenameto"
                       :label="item.table_name" :key="item.table_name" :value="item.table_name">
@@ -56,7 +56,7 @@
               <el-col :span="8">
                 <el-form-item label="来源库">
                   <el-select v-model="tableConfigForm.datafrom" placeholder="同步任务来源数据库" size="large" :disabled="addLock"
-                             @change="dataSourceChange(tableConfigForm.datafrom,'datafrom')" filterable clearable>
+                             @change="dataSourceChange(tableConfigForm.datafrom,'datafrom')" filterable>
                     <el-option
                       v-for="item in datasource"
                       :label="item.name" :key="item.id" :value="item.id">
@@ -68,7 +68,7 @@
                 <el-form-item label="来源表">
                   <el-select v-model="tableConfigForm.tablefrom" placeholder="同步任务来源表" size="large" :disabled="addLock"
                              @change="tableFromChange"
-                             filterable clearable>
+                             filterable>
                     <el-option
                       v-for="item in tableConfigForm.tablenamefrom"
                       :label="item.table_name" :key="item.table_name" :value="item.table_name">
@@ -238,7 +238,8 @@
         /**数据源**/
         datasource: [],
         /**默认选项**/
-        defaulttypeSelect: [{name: '无默认值', value: '0'}, {name: '列值为空时默认', value: '1'}, {name: '强制默认', value: '2'}],
+        defaulttypeSelect: [{name: '无默认值', value: '0'}, {name: '强制默认', value: '2'}],
+//        defaulttypeSelect: [{name: '无默认值', value: '0'}, {name: '列值为空时默认', value: '1'}, {name: '强制默认', value: '2'}],
         /**新增初始化值**/
         initTableConfigDialog: {
           id: '',
@@ -303,8 +304,6 @@
           } else {
             this.$message.error(res.msg);
           }
-        }).catch((res) => {
-          this.$message.error(res);
         });
       },
       /**
@@ -322,8 +321,6 @@
           } else {
             this.$message.error(res.msg);
           }
-        }).catch((res) => {
-          this.$message.error(res);
         });
       },
       tableFromChange: function () {
@@ -355,8 +352,6 @@
           } else {
             this.$message.error(res.msg);
           }
-        }).catch((res) => {
-          this.$message.error(res);
         });
       },
       /**
@@ -439,8 +434,6 @@
                 } else {
                   this.$message.error(res.msg);
                 }
-              }).catch(() => {
-                this.saveFormLoading = false;
               });
             }).catch(() => {
               //取消操作

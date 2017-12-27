@@ -36,7 +36,7 @@ public class NoCloseDataBase {
         this.driver = dataSource.getDriver();
         try {
             Class.forName(dataSource.getDriver());
-            if(null != dataSource.getRealurl()){
+            if(null != dataSource.getRealurl() && !"".equals(dataSource.getRealurl())){
                 this.con = DriverManager.getConnection(dataSource.getRealurl(), dataSource.getUsername(), dataSource.getPassword());
             }else {
                 this.con = DriverManager.getConnection(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());

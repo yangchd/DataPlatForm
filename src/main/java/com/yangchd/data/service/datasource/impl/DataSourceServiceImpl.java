@@ -60,7 +60,7 @@ public class DataSourceServiceImpl implements IDataSourceService {
         Connection con;
         try {
             Class.forName(dataSource.getDriver());
-            if(null != dataSource.getRealurl()){
+            if(null != dataSource.getRealurl() && !"".equals(dataSource.getRealurl())){
                 con = DriverManager.getConnection(dataSource.getRealurl(), dataSource.getUsername(), dataSource.getPassword());
             }else {
                 con = DriverManager.getConnection(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());

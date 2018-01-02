@@ -14,23 +14,45 @@
         </el-form-item>
       </el-form>
     </el-col>
-
     <!--中部列表-->
     <el-table :data="table" v-loading="tableLoading" border stripe size="small"
               style="width: 100%;">
       <el-table-column prop="id" v-if="false">
       </el-table-column>
-      <el-table-column prop="name" label="任务名称" width="180">
+      <el-table-column prop="name" label="任务名称">
       </el-table-column>
       <el-table-column prop="tableto" label="目标表">
       </el-table-column>
-      <el-table-column prop="lasttime" label="上次同步时间" width="180">
+      <el-table-column
+        label="上次同步时间"
+        width="180">
+        <template slot-scope="scope">
+          <i class="el-icon-time"></i>
+          <span style="margin-left: 10px">{{ scope.row.lasttime }}</span>
+        </template>
       </el-table-column>
-      <el-table-column prop="timecost" label="上次同步耗时" width="100">
+      <el-table-column
+        label="上次同步耗时"
+        width="100">
+        <template slot-scope="scope">
+          <el-popover trigger="hover" placement="top">
+            <p>查询耗时: {{ scope.row.sqlquerytime }}</p>
+            <p>计算耗时: {{ scope.row.computetime }}</p>
+            <p>更新耗时: {{ scope.row.sqlruntime }}</p>
+            <div slot="reference" class="name-wrapper" >
+              <el-tag size="small" style="width: 75px">{{ scope.row.timecost }}</el-tag>
+            </div>
+          </el-popover>
+        </template>
       </el-table-column>
-      <el-table-column prop="synflag" label="同步开关" width="100">
-      </el-table-column>
-      <el-table-column label="操作" width="300px">
+      <!--<el-table-column prop="synflag" label="同步开关" width="80">-->
+        <!--<template slot-scope="scope">-->
+          <!--<el-switch-->
+            <!--v-model="scope.row.synflag">-->
+          <!--</el-switch>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
+      <el-table-column label="操作" width="250px">
         <template slot-scope="scope">
           <el-button size="mini" @click="testTableConfigBtn(scope.$index, scope.row)">测试</el-button>
           <el-button size="mini" @click="editTableConfigBtn(scope.$index, scope.row)">编辑</el-button>
@@ -159,6 +181,9 @@
           }
           if ("true" === res.data[i].errorflag) {
             res.data[i].errorflag = true;
+          }
+          if ("true" === res.data[i].synflag) {
+            res.data[i].synflag = true;
           }
         }
       },

@@ -192,7 +192,16 @@
                       </el-switch>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="12"></el-col>
+                  <el-col :span="6">
+                    <el-form-item label="批量同步">
+                      <el-switch
+                        v-model="tableConfigForm.synflag"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949">
+                      </el-switch>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="6"></el-col>
                 </el-row>
                 <el-row>
                   <el-col :span="24">
@@ -260,6 +269,7 @@
           //高级选项
           synvalue: ['update', 'insert', 'delete'],
           syntype: '',
+          synflag: true,
           logflag: false,
           errorflag: false,
           whereto: '',

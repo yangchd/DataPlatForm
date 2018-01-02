@@ -26,8 +26,10 @@ let routes = [
     iconCls: 'el-icon-refresh',//图标样式class
     component: Home,
     children: [
-      {path: '/datasource',name:'数据源', component: DataSource},
+      {path: '/datasource',name:'数据源管理', component: DataSource},
       {path: '/table',name:'同步信息', component: TableConfig},
+      {path: '/query',name:'数据查询', component: Developing},
+      {path: '/export',name:'表结构导出', component: Developing},
       {path: '/statistics',name:'同步统计', component: Developing},
     ],
   },{
@@ -38,6 +40,22 @@ let routes = [
     // hidden:true,
     children: [
       {path: '/quartz',name:'任务列表', component: Developing},
+    ],
+  },{
+    path: '/',
+    name: '云盘',
+    iconCls: 'el-icon-upload',//图标样式class
+    component: Home,
+    children: [
+      {path: '/disk',name:'云盘', component: Developing},
+    ],
+  },{
+    path: '/',
+    name: '应用管理',
+    iconCls: 'el-icon-mobile-phone',//图标样式class
+    component: Home,
+    children: [
+      {path: '/app',name:'应用列表', component: Developing},
     ],
   },{
     path: '/',
